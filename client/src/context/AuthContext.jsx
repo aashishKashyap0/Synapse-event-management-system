@@ -33,8 +33,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('Attempting login with:', email);
+      console.log('API baseURL:', api.defaults.baseURL);
+      
       // Use the api instance which already has the correct baseURL
       const response = await api.post('/auth/login', { email, password });
+      
+      console.log('Login response:', response.data);
       
       // Backend returns { message, token, user }
       if (response.data.token && response.data.user) {
@@ -51,15 +56,18 @@ export const AuthProvider = ({ children }) => {
         // Set default authorization header
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
+        console.log('Login successful, user:', user);
         return { success: true, user };
       }
       
+      console.log('Login failed: no token or user in response');
       return {
         success: false,
         message: response.data.message || 'Login failed'
       };
     } catch (error) {
       console.error('Login error:', error);
+      console.error('Error response:', error.response?.data);
       return {
         success: false,
         message: error.response?.data?.message || 'Login failed'
